@@ -17,7 +17,7 @@ ggplot(
   data = number_dwellings, 
   mapping = aes(x = State, y = DwellingNo, fill = DwellingNo, label = DwellingNo )
 ) +
-  geom_col(width = 0.7) +   geom_col(fill = "green", width = 0.75) +
+  geom_col(width = 0.7) +   geom_col(fill = "red", width = 0.75) +
   geom_text() +
   labs(title = "Figure 1",
        x = "State",
