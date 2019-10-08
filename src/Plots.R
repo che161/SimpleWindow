@@ -6,14 +6,17 @@ allstate
 abs_allstate <- allstate %>% mutate(AbsDiff = abs(StarDiff))
 by_state <- group_by(abs_allstate, by = State)
 by_state
-summarise(by_state,MaxStarDiff= max(StarDiff), MinStarDiff= min(StarDiff),MeanStarDiff= mean(AbsDiff) )
-
+diff <- allstate %>% group_by(State) %>% mutate(AbsDiff = abs(StarDiff)) %>% 
+  summarise(MaxStarDiff= max(StarDiff), MinStarDiff= min(StarDiff),MeanStarDiff= mean(AbsDiff) )
+diff
+number_dwellings <- allstate %>% group_by(State) %>% summarise(DwellingNo = n() )
+number_dwellings
 
 # Using ggplot2
 ggplot(data = AllState)
 ?ggplot
 ggplot(
-  data = AllState, 
+  data = number_dwellings, 
   mapping = aes(x = gdpPercap, y = lifeExp, colour = continent, size = pop)
 ) 
 
