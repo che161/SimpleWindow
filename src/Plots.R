@@ -15,19 +15,23 @@ number_dwellings
 # Using ggplot2
 ggplot(
   data = number_dwellings, 
-  mapping = aes(x = State, y = DwellingNo, fill = DwellingNo, label = DwellingNo )
+  mapping = aes(x = State, y = DwellingNo,  label = DwellingNo,
+                col.lab="red", cex.axis = 3, cex.lab = 4)
 ) +
-  geom_col(width = 0.7) +   geom_col(fill = "red", width = 0.75) +
+  geom_col(width = 0.7) +   geom_col(fill = "green", width = 0.75) +
   geom_text() +
   labs(title = "Figure 1",
        x = "State",
        y = "Number of Dwellings"
   )
 
-ggplot(data = number_dwellings)
-?ggplot
 ggplot(
   data = number_dwellings, 
-  mapping = aes(x = gdpPercap, y = lifeExp, colour = continent, size = pop)
-) 
-?
+  mapping = aes(x = State, y = DwellingNo, fill = DwellingNo, label = DwellingNo )
+) +
+  geom_col(width = 0.7) +   geom_col(fill = "green", width = 0.75) +
+  geom_text() +
+  labs(title = "Figure 1",
+       x = "State",
+       y = "Number of Dwellings"
+  )
