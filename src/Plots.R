@@ -17,44 +17,52 @@ stardiff
 averagediff <- group_by(abs_allstate, State) %>% summarise(MeanDiff = mean(AbsDiff) )
 averagediff
 # Using ggplot2
-ggplot(
+figure1 <- ggplot(
   data = number_dwellings, 
   mapping = aes(x = State, y = DwellingNo,  label = DwellingNo,
                 col.lab="red", cex.axis = 3, cex.lab = 4)
 ) +
-  geom_col(width = 0.7) +   geom_col(fill = "green", width = 0.75) +
-  geom_text(aes(label = DwellingNo), colour ="blue", vjust = -0.5) +
-  labs(title = "Figure 1",
+  geom_col(fill = "green", width = 0.5) +
+  geom_text(aes(label = DwellingNo), colour ="blue", vjust = -0.5, fontface = "bold") +
+  labs(title = "Figure 1. Number of dwellings simmulated in each State",
        x = "State",
        y = "Number of Dwellings"
   ) +
+  ylim(0, 600) +
   theme(axis.title = element_text(colour = "red", face = "bold", size = 18))
-  
+figure1  
+ggsave("fig/Figure_1.png", plot = figure1)
 
-ggplot(
+figure2 <- ggplot(
   data = stardiff, 
   mapping = aes(x = StarDiff, y = DwellingNo, group = State, label = DwellingNo )
 ) +
   geom_col(fill = "green",width = 0.05) +   
-  geom_text(aes(label = DwellingNo), colour = "blue", vjust = -0.15) +
-  labs(title = "Figure 2",
+  geom_text(aes(label = DwellingNo), colour = "blue", vjust = -0.15, fontface = "bold") +
+  labs(title = "Figure 2. Star rating difference distribution in each State",
        x = "Star Rating Difference",
        y = "Number of Dwellings"
   ) +
+  ylim(0, 220) +
   theme(axis.title = element_text(colour = "red", face = "bold", size = 18))+
     facet_wrap( ~ State)
+figure2
+ggsave("fig/Figure_2.png", plot = figure2)
 
-ggplot(
+figure3 <- ggplot(
   data = averagediff, 
   mapping = aes(x = State, y = MeanDiff, label = sprintf("%.02f %%", MeanDiff),
-                col.lab="red", cex.axis = 3, cex.lab = 4)
+                col.lab="red", cex.axis = 3, cex.lab = 4, fontface = "bold")
 ) +
-  geom_col(width = 0.7) +   geom_col(fill = "green", width = 0.75) +
+  geom_col(fill = "green", width = 0.5) +
   geom_text(aes(label = sprintf("%.02f", MeanDiff)), colour ="blue", vjust = -0.5) +
-  labs(title = "Figure 3",
+  labs(title = "Figure 3. Mean star raing difference in each State",
        x = "State",
        y = "Mean Star Rating Difference"
-  ) +
+  ) + 
+  ylim(0, 0.24) +
   theme(axis.title = element_text(colour = "red", face = "bold", size = 18))
+figure3  
+ggsave("fig/Figure_3.png", plot = figure3)
 
-
+?sprintf
