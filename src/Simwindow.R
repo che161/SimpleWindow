@@ -1,9 +1,11 @@
 library(tidyverse)
 #CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 #CCCCCCCCCCCCCCCCC       Clean data       CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+#CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 # Clean data for NT
 overheat_result2 <- read_fwf("data/NT/Result2.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
-        StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+        StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20
+        ,
         CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
 overheat_result2_error <- read_fwf("data/NT/Result2_error.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
         StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
@@ -44,19 +46,21 @@ overheat_star <- select(overheat_clean, Nvalid, StarRating)
 overheat_star
 
 overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nvalid") %>% 
-  mutate(StarDiff = StarRating.x - StarRating.y) %>% 
-  rename(StarratingOrig = StarRating.x, StarratingOrig = StarRating.x) %>% 
+  mutate(StarDiff = StarRating.x - StarRating.y, State = "NT") %>% 
+  rename(StarratingOrig = StarRating.x, Starrating = StarRating.y) %>%
+  select(State,StarDiff) %>% 
   write_csv("res/NT/Result2_StarDiff.csv")
 
-overheat_stardiff
-?rename
+overheat_stardiff_NT <- overheat_stardiff
+overheat_stardiff_NT
+
 # Clean data for ACT
 overheat_result2 <- read_fwf("data/ACT/Result2.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
                                                             StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
                                                             CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
 overheat_result2_error <- read_fwf("data/ACT/Result2_error.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
-                                                                        StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
-                                                                        CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+                                                            StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                            CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
 overheat_result2
 overheat_result2_error
 validRow <- overheat_result2 %>% 
@@ -93,26 +97,241 @@ overheat_star <- select(overheat_clean, Nvalid, StarRating)
 overheat_star
 
 overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nvalid") %>% 
-  mutate(StarDiff = StarRating.x - StarRating.y) %>% 
+  mutate(StarDiff = StarRating.x - StarRating.y, State = "ACT") %>% 
+  rename(StarratingOrig = StarRating.x, Starrating = StarRating.y) %>%
+  select(State,StarDiff) %>% 
   write_csv("res/ACT/Result2_StarDiff.csv")
 
-overheat_stardiff
+overheat_stardiff_ACT <- overheat_stardiff
+overheat_stardiff_ACT
+
+# Clean data for TAS
+overheat_result2 <- read_fwf("data/TAS/Result2.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                            StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                            CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2_error <- read_fwf("data/TAS/Result2_error.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                           StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                           CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2
+overheat_result2_error
+validRow <- overheat_result2 %>% 
+  anti_join(overheat_result2_error, by = "ScratchName" ) %>% select("Nvalid")
+validRow
+
+overheatcsv_orig <- read.csv("data/TAS/Result2_Orig.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv_orig
+
+overheatorig_clean <- overheatcsv_orig %>% semi_join(validRow, by = "Nvalid") %>%
+  write_csv("res/TAS/Result2_Orig_Clean.csv")
+
+overheatcsv <- read.csv("data/TAS/Result2.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv
+
+overheat_clean <- overheatcsv %>% semi_join(validRow, by = "Nvalid") %>% 
+  write_csv("res/TAS/Result2_Clean.csv")
+
+overheat_star_Orig <- select(overheatorig_clean, Nvalid, StarRating)
+overheat_star_Orig
+overheat_star <- select(overheat_clean, Nvalid, StarRating)
+overheat_star
+
+overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nvalid") %>% 
+  mutate(StarDiff = StarRating.x - StarRating.y, State = "TAS") %>% 
+  rename(StarratingOrig = StarRating.x, Starrating = StarRating.y) %>%
+  select(State,StarDiff) %>% 
+  write_csv("res/TAS/Result2_StarDiff.csv")
+
+overheat_stardiff_TAS <- overheat_stardiff
+overheat_stardiff_TAS
+
+# Clean data for QLD
+overheat_result2 <- read_fwf("data/QLD/Result2.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                             StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                             CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2_error <- read_fwf("data/QLD/Result2_error.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                             StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                            CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2
+overheat_result2_error
+validRow <- overheat_result2 %>% 
+  anti_join(overheat_result2_error, by = "ScratchName" ) %>% select("Nvalid")
+validRow
+
+overheatcsv_orig <- read.csv("data/QLD/Result2_Orig.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv_orig
+
+overheatorig_clean <- overheatcsv_orig %>% semi_join(validRow, by = "Nvalid") %>%
+  write_csv("res/QLD/Result2_Orig_Clean.csv")
+
+overheatcsv <- read.csv("data/QLD/Result2.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv
+
+overheat_clean <- overheatcsv %>% semi_join(validRow, by = "Nvalid") %>% 
+  write_csv("res/QLD/Result2_Clean.csv")
+
+overheat_star_Orig <- select(overheatorig_clean, Nvalid, StarRating)
+overheat_star_Orig
+overheat_star <- select(overheat_clean, Nvalid, StarRating)
+overheat_star
+
+overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nvalid") %>% 
+  mutate(StarDiff = StarRating.x - StarRating.y, State = "QLD") %>% 
+  rename(StarratingOrig = StarRating.x, Starrating = StarRating.y) %>%
+  select(State,StarDiff) %>% 
+  write_csv("res/QLD/Result2_StarDiff.csv")
+
+overheat_stardiff_QLD <- overheat_stardiff
+overheat_stardiff_QLD
+
+# Clean data for WA
+overheat_result2 <- read_fwf("data/WA/Result2.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                             StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                             CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2_error <- read_fwf("data/WA/Result2_error.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                                         StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                                         CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2
+overheat_result2_error
+validRow <- overheat_result2 %>% 
+  anti_join(overheat_result2_error, by = "ScratchName" ) %>% select("Nvalid")
+validRow
+
+overheatcsv_orig <- read.csv("data/WA/Result2_Orig.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv_orig
+
+overheatorig_clean <- overheatcsv_orig %>% semi_join(validRow, by = "Nvalid") %>%
+  write_csv("res/WA/Result2_Orig_Clean.csv")
+
+overheatcsv <- read.csv("data/WA/Result2.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv
+
+overheat_clean <- overheatcsv %>% semi_join(validRow, by = "Nvalid") %>% 
+  write_csv("res/WA/Result2_Clean.csv")
+
+overheat_star_Orig <- select(overheatorig_clean, Nvalid, StarRating)
+overheat_star_Orig
+overheat_star <- select(overheat_clean, Nvalid, StarRating)
+overheat_star
+
+overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nvalid") %>% 
+  mutate(StarDiff = StarRating.x - StarRating.y, State = "WA") %>% 
+  rename(StarratingOrig = StarRating.x, Starrating = StarRating.y) %>%
+  select(State,StarDiff) %>% 
+  write_csv("res/WA/Result2_StarDiff.csv")
+
+overheat_stardiff_WA <- overheat_stardiff
+overheat_stardiff_WA
+
+# Clean data for SA
+overheat_result2 <- read_fwf("data/SA/Result2.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                             StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                             CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2_error <- read_fwf("data/SA/Result2_error.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                                         StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                                         CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2
+overheat_result2_error
+validRow <- overheat_result2 %>% 
+  anti_join(overheat_result2_error, by = "ScratchName" ) %>% select("Nvalid")
+validRow
+
+overheatcsv_orig <- read.csv("data/SA/Result2_Orig.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv_orig
+
+overheatorig_clean <- overheatcsv_orig %>% semi_join(validRow, by = "Nvalid") %>%
+  write_csv("res/SA/Result2_Orig_Clean.csv")
+
+overheatcsv <- read.csv("data/SA/Result2.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv
+
+overheat_clean <- overheatcsv %>% semi_join(validRow, by = "Nvalid") %>% 
+  write_csv("res/SA/Result2_Clean.csv")
+
+overheat_star_Orig <- select(overheatorig_clean, Nvalid, StarRating)
+overheat_star_Orig
+overheat_star <- select(overheat_clean, Nvalid, StarRating)
+overheat_star
+
+overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nvalid") %>% 
+  mutate(StarDiff = StarRating.x - StarRating.y, State = "SA") %>% 
+  rename(StarratingOrig = StarRating.x, Starrating = StarRating.y) %>%
+  select(State,StarDiff) %>% 
+  write_csv("res/SA/Result2_StarDiff.csv")
+
+overheat_stardiff_SA <- overheat_stardiff
+overheat_stardiff_SA
 
 #cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #CCCCCCCCCCCCCCCCCCCC     Merge clean data  ccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-?anti_join
+bindAll <- bind_rows(overheat_stardiff_NT, overheat_stardiff_SA, 
+                     overheat_stardiff_TAS, overheat_stardiff_QLD,
+                     overheat_stardiff_WA,overheat_stardiff_ACT) 
 
+allstate <- bindAll
+bindAll %>% format(digits=1) %>% 
+  write_csv("res/Result2_Orig_Clean_AllState.csv")
+bindAll
 
 #cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #CCCCCCCCCCCCCCCCCCCC          PLOT         ccccccccccccccccccccccccccccccccccccccccccccccccccccc
+allstate <- read.csv("res/Result2_Orig_Clean_AllState.csv")
 
-allstate <- read.csv("data/Result2_Orig_Clean_AllState.csv")
-allstate
-
+#allstate
+#view(allstate)
 abs_allstate <- allstate %>% mutate(AbsDiff = abs(StarDiff))
+abs_allstate
 by_state <- group_by(abs_allstate, by = State)
 by_state
+
 diff <- allstate %>% group_by(State) %>% mutate(AbsDiff = abs(StarDiff)) %>% 
   summarise(MaxStarDiff= max(StarDiff), MinStarDiff= min(StarDiff),MeanStarDiff= mean(AbsDiff) )
 diff
@@ -142,7 +361,7 @@ ggsave("fig/Figure_1.png", plot = figure1)
 
 figure2 <- ggplot(
   data = stardiff, 
-  mapping = aes(x = StarDiff, y = DwellingNo, group = State, label = DwellingNo )
+  mapping = aes(x = StarDiff, y = DwellingNo, group = State)
 ) +
   geom_col(fill = "green",width = 0.05) +   
   geom_text(aes(label = DwellingNo), colour = "blue", vjust = -0.15, fontface = "bold") +
@@ -162,7 +381,7 @@ figure3 <- ggplot(
                 col.lab="red", cex.axis = 3, cex.lab = 4, fontface = "bold")
 ) +
   geom_col(fill = "green", width = 0.5) +
-  geom_text(aes(label = sprintf("%.02f", MeanDiff)), colour ="blue", vjust = -0.5) +
+  geom_text(aes(label = sprintf("%.03f", MeanDiff)), colour ="blue", vjust = -0.5) +
   labs(title = "Figure 3. Mean star raing difference in each State",
        x = "State",
        y = "Mean Star Rating Difference"
@@ -172,5 +391,4 @@ figure3 <- ggplot(
 figure3  
 ggsave("fig/Figure_3.png", plot = figure3)
 
-?sprintf
 
