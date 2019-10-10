@@ -35,12 +35,17 @@ overheatcsv
 overheat_clean <- overheatcsv %>% semi_join(validRow, by = "Nvalid") %>% 
   write_csv("res/NT/Result2_Clean.csv")
 
-overheat_star_Orig <- select(overheatorig_clean, StarRating)
+overheat_star_Orig <- select(overheatorig_clean, Nvalid, StarRating)
 overheat_star_Orig
-overheat_star <- select(overheat_clean, StarRating)
+overheat_star <- select(overheat_clean, Nvalid, StarRating)
 overheat_star
 
-overheat_stardiff <- overheat_star_Orig %>% 
+overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nvalid") %>% 
+  mutate(StarDiff = StarRating.x - StarRating.y) %>% 
+  write_csv("res/NT/Result2_StarDiff.csv")
+
+overheat_stardiff
+
 #cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #CCCCCCCCCCCCCCCCCCCC     Merge clean data  ccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
