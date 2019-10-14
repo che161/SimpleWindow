@@ -524,24 +524,41 @@ figure1
 ggsave("fig/Figure_1.png", plot = figure1)
 
 
-
-
-
-figure2 <- ggplot(
-  data = stardiff, 
+# Plot the figure in two groups due to large number of houses in VIC and NSW
+stardiff
+stardiff_VIC_NSW <- stardiff %>% filter(State =="VIC"|State =="NSW")
+stardiff_OtherStates <- stardiff %>% filter(State !="VIC",State !="NSW")
+figure2a <- ggplot(
+  data = stardiff_VIC_NSW, 
   mapping = aes(x = StarDiff, y = DwellingNo, group = State)
 ) +
   geom_col(fill = "green",width = 0.05) +   
-  geom_text(aes(label = DwellingNo), colour = "blue", vjust = -0.15, fontface = "bold", size = 2) +
+  geom_text(aes(label = DwellingNo), colour = "blue", vjust = -0.15, fontface = "bold", size = 4) +
+  labs(title = "Figure 2a. Star rating difference distribution in each State",
+       x = "Star Rating Difference",
+       y = "Number of Dwellings"
+  ) +
+  ylim(0, 4000) +
+  theme(axis.title = element_text(colour = "red", face = "bold", size = 18))+
+  facet_wrap( ~ State)
+figure2a
+ggsave("fig/Figure_2a.png", plot = figure2a)
+
+figure2b <- ggplot(
+  data = stardiff_OtherStates, 
+  mapping = aes(x = StarDiff, y = DwellingNo, group = State)
+) +
+  geom_col(fill = "green",width = 0.05) +   
+  geom_text(aes(label = DwellingNo), colour = "blue", vjust = -0.15, fontface = "bold", size = 4) +
   labs(title = "Figure 2. Star rating difference distribution in each State",
        x = "Star Rating Difference",
        y = "Number of Dwellings"
   ) +
-  ylim(0, 5000) +
+  ylim(0, 250) +
   theme(axis.title = element_text(colour = "red", face = "bold", size = 18))+
   facet_wrap( ~ State)
-figure2
-ggsave("fig/Figure_2.png", plot = figure2)
+figure2b
+ggsave("fig/Figure_2b.png", plot = figure2b)
 
 figure3 <- ggplot(
   data = averagediff, 
