@@ -331,7 +331,16 @@ overheatcsv_orig <- read.csv("data/VIC/Result2_Orig.csv", header = FALSE, col.na
 ))
 overheatcsv_orig
 
-overheatorig_clean <- overheatcsv_orig %>% semi_join(validRow, by = "Nvalid") %>%
+overheatorig_clean <- overheatcsv_orig %>% semi_join(validRow, by = "Nvalid") %>%  
+  write_csv("res/VIC/Result2_Orig_Clean.csv")
+
+overheatorig_clean2 <- overheatorig_clean %>% filter(StarRating != "*****",StarRating != "0" ) %>%
+  filter(StarRating != "0" ) %>%
+  mutate(StarRating = as.numeric(StarRating)) %>% 
+  filter(StarRating > 0.1 ) %>%  
+  write_csv("res/VIC/Result2_Orig_Clean.csv")
+
+overheatorig_clean <- overheatorig_clean2 %>%  
   write_csv("res/VIC/Result2_Orig_Clean.csv")
 
 overheatcsv <- read.csv("data/VIC/Result2.csv", header = FALSE, col.names = c(
@@ -343,7 +352,16 @@ overheatcsv <- read.csv("data/VIC/Result2.csv", header = FALSE, col.names = c(
 ))
 overheatcsv
 
-overheat_clean <- overheatcsv %>% semi_join(validRow, by = "Nvalid") %>% 
+overheat_clean <- overheatcsv %>% semi_join(validRow, by = "Nvalid") %>%  
+  write_csv("res/VIC/Result2_Clean.csv")
+
+overheat_clean2 <- overheat_clean %>% filter(StarRating != "*****",StarRating != "0" ) %>%
+  filter(StarRating != "0" ) %>%
+  mutate(StarRating = as.numeric(StarRating)) %>% 
+  filter(StarRating > 0.1 ) %>%  
+  write_csv("res/VIC/Result2_Clean.csv")
+
+overheat_clean <-overheat_clean2 %>%  
   write_csv("res/VIC/Result2_Clean.csv")
 
 overheat_star_Orig <- select(overheatorig_clean, Nvalid, StarRating)
@@ -391,7 +409,7 @@ bindAll_State
 #CCCCCCCCCCCCCCCCCCCC          PLOT         ccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #allstate <- read.csv("res/Result2_Orig_Clean_AllState.csv") 
 #allstate
-view(allstate)
+#view(allstate)
 allstate <- allstate %>% mutate(StarDiff = as.numeric(StarDiff))
 abs_allstate <- allstate %>% mutate(AbsDiff = abs(StarDiff))
 abs_allstate
