@@ -384,12 +384,88 @@ overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nval
 overheat_stardiff_VIC <- overheat_stardiff
 overheat_stardiff_VIC
 
+# Clean data for NSW
+overheat_result2 <- read_fwf("data/NSW/Result2.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                             StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                             CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2_error <- read_fwf("data/NSW/Result2_error.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
+                                                                         StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+                                                                         CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+overheat_result2
+overheat_result2_error
+validRow <- overheat_result2 %>% 
+  anti_join(overheat_result2_error, by = "ScratchName" ) %>% select("Nvalid")
+validRow
+
+overheatcsv_orig <- read.csv("data/NSW/Result2_Orig.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv_orig
+
+overheatorig_clean <- overheatcsv_orig %>% semi_join(validRow, by = "Nvalid") %>%  
+  write_csv("res/NSW/Result2_Orig_Clean.csv")
+
+overheatorig_clean2 <- overheatorig_clean %>% filter(StarRating != "*****",StarRating != "0" ) %>%
+  filter(StarRating != "0" ) %>%
+  mutate(StarRating = as.numeric(StarRating)) %>% 
+  filter(StarRating > 0.1 ) %>%  filter(StarRating < 10.1 ) %>% 
+  write_csv("res/NSW/Result2_Orig_Clean.csv")
+
+overheatorig_clean <- overheatorig_clean2 %>%  
+  write_csv("res/NSW/Result2_Orig_Clean.csv")
+
+overheatcsv <- read.csv("data/NSW/Result2.csv", header = FALSE, col.names = c(
+  "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
+  "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
+  "TotFloorArea", "SlabOnGroundArea", "FloorsAboveGround", "SubfloorFloorArea",
+  "FloorsAboveNeighbours_100","CeilingsBelowNeighbours","TotalSharedSurfaceArea",
+  "FloorHeightmin","FloorHeightmax","NumberofLiving","NumberofBedrooms","MStorey", "NStorey"
+))
+overheatcsv
+
+overheat_clean <- overheatcsv %>% semi_join(validRow, by = "Nvalid") %>%  
+  write_csv("res/NSW/Result2_Clean.csv")
+
+overheat_clean2 <- overheat_clean %>% filter(StarRating != "*****",StarRating != "0" ) %>%
+  filter(StarRating != "0" ) %>%
+  mutate(StarRating = as.numeric(StarRating)) %>% 
+  filter(StarRating > 0.1 ) %>%  filter(StarRating < 10.1 ) %>% 
+  write_csv("res/NSW/Result2_Clean.csv")
+
+overheat_clean <-overheat_clean2 %>%  
+  write_csv("res/NSW/Result2_Clean.csv")
+
+overheat_star_Orig <- select(overheatorig_clean, Nvalid, StarRating)
+overheat_star_Orig
+overheat_star <- select(overheat_clean, Nvalid, StarRating)
+overheat_star
+#overheat_star_Orig <- overheat_star_Orig %>% filter(StarRating != "*****") %>%
+#  filter(StarRating != "0") 
+#  mutate(StarRating = as.numeric(StarRating))
+#overheat_star <- overheat_star %>% filter(StarRating != "*****",StarRating != "0" ) %>%
+#  filter(StarRating != "0" ) %>%
+#  mutate(StarRating = as.numeric(StarRating)) 
+
+overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nvalid") %>% 
+  mutate(StarDiff = StarRating.x - StarRating.y, State = "NSW") %>% 
+  rename(StarratingOrig = StarRating.x, Starrating = StarRating.y) %>%
+  select(State,StarDiff) %>% 
+  write_csv("res/NSW/Result2_StarDiff.csv")
+
+overheat_stardiff_NSW <- overheat_stardiff
+overheat_stardiff_NSW
+
 #cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #CCCCCCCCCCCCCCCCCCCC     Merge clean data  ccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 bindAll <- bind_rows(overheat_stardiff_NT, overheat_stardiff_SA, 
                      overheat_stardiff_TAS, overheat_stardiff_QLD,
-                     overheat_stardiff_WA,overheat_stardiff_ACT,overheat_stardiff_VIC) 
+                     overheat_stardiff_WA,overheat_stardiff_ACT,
+                     overheat_stardiff_VIC,overheat_stardiff_NSW) 
 bindAll
 bindAll_Diff <- bindAll %>% select(StarDiff)
 bindAll_Diff
@@ -442,10 +518,14 @@ figure1 <- ggplot(
        x = "State",
        y = "Number of Dwellings"
   ) +
-  ylim(0, 3800) +
+  ylim(0, 20000) +
   theme(axis.title = element_text(colour = "red", face = "bold", size = 18))
 figure1  
 ggsave("fig/Figure_1.png", plot = figure1)
+
+
+
+
 
 figure2 <- ggplot(
   data = stardiff, 
@@ -457,7 +537,7 @@ figure2 <- ggplot(
        x = "Star Rating Difference",
        y = "Number of Dwellings"
   ) +
-  ylim(0, 1200) +
+  ylim(0, 5000) +
   theme(axis.title = element_text(colour = "red", face = "bold", size = 18))+
   facet_wrap( ~ State)
 figure2
