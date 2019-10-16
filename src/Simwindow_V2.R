@@ -493,7 +493,7 @@ by_state <- group_by(abs_allstate, by = State)
 by_state
 
 diff <- allstate %>% group_by(State) %>% mutate(AbsDiff = abs(StarDiff)) %>% 
-  summarise(MaxStarDiff= max(StarDiff), MinStarDiff= min(StarDiff),MeanStarDiff= mean(AbsDiff) )
+  summarise(MaxStarDiff= max(StarDiff), MinStarDiff= min(StarDiff),MeanStarDiff= mean(StarDiff),MeanAbsStarDiff= mean(AbsDiff) )
 diff
 number_dwellings <- allstate %>% group_by(State) %>% summarise(DwellingNo = n() )
 number_dwellings
@@ -504,7 +504,7 @@ stardiff
 ?as.numeric
 
 #view(stardiff)
-averagediff <- group_by(abs_allstate, State) %>% summarise(MeanDiff = mean(AbsDiff) ) 
+averagediff <- group_by(abs_allstate, State) %>% summarise(MeanStarDiff= mean(StarDiff),MeanAbsStarDiff= mean(AbsDiff) ) 
 averagediff
 # Using ggplot2
 figure1 <- ggplot(
@@ -560,14 +560,16 @@ figure2b <- ggplot(
 figure2b
 ggsave("fig/Figure_2b.png", plot = figure2b)
 
+#plot averaged absolute star rating difference
+
 figure3 <- ggplot(
   data = averagediff, 
-  mapping = aes(x = State, y = MeanDiff, label = sprintf("%.02f %%", MeanDiff),
+  mapping = aes(x = State, y = MeanAbsStarDiff, label = sprintf("%.02f %%", MeanAbsStarDiff),
                 col.lab="red", cex.axis = 3, cex.lab = 4, fontface = "bold")
 ) +
   geom_col(fill = "green", width = 0.5) +
-  geom_text(aes(label = sprintf("%.03f", MeanDiff)), colour ="blue", vjust = -0.5) +
-  labs(title = "Figure 3. Mean star raing difference in each State",
+  geom_text(aes(label = sprintf("%.03f", MeanAbsStarDiff)), colour ="blue", vjust = -0.5) +
+  labs(title = "Figure 3. Mean ABSOLUTE star raing difference in each State",
        x = "State",
        y = "Mean Star Rating Difference"
   ) + 
@@ -576,4 +578,19 @@ figure3 <- ggplot(
 figure3  
 ggsave("fig/Figure_3.png", plot = figure3)
 
-
+#plot averaged star rating difference
+figure4 <- ggplot(
+  data = averagediff, 
+  mapping = aes(x = State, y = MeanStarDiff, label = sprintf("%.02f %%", MeanStarDiff),
+                col.lab="red", cex.axis = 3, cex.lab = 4, fontface = "bold")
+) +
+  geom_col(fill = "green", width = 0.5) +
+  geom_text(aes(label = sprintf("%.03f", MeanStarDiff)), colour ="blue", vjust = -0.5) +
+  labs(title = "Figure 4. Mean star raing difference in each State",
+       x = "State",
+       y = "Mean Star Rating Difference"
+  ) + 
+  ylim(-0.16, 0.16) +
+  theme(axis.title = element_text(colour = "red", face = "bold", size = 18))
+figure4  
+ggsave("fig/Figure_4.png", plot = figure4)
