@@ -1,6 +1,0 @@
----
-title: "SimpleWindow"
-author: "Dong Chen"
-date: "17/10/2019"
-output: html_document
----
