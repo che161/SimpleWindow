@@ -49,6 +49,11 @@ knitr::kable(head(gapminder, n = 5), format = "html", caption = "A table of data
 
 **Images from a file**
 
+```{r, out.width="300px",fig.align='center',echo=FALSE}
+knitr::include_graphics("../fig/Figure_2b.png")
+knitr::include_graphics("../fig/Figure_3.png")
+```
+
 ![](resources/img/tidyverse.png){width=100px}
 
 **Plots from R**
