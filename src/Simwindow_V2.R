@@ -510,6 +510,8 @@ by_state
 diff <- allstate %>% group_by(State) %>% mutate(AbsDiff = abs(StarDiff)) %>% 
   summarise(MaxStarDiff= max(StarDiff), MinStarDiff= min(StarDiff),MeanStarDiff= mean(StarDiff),MeanAbsStarDiff= mean(AbsDiff) )
 diff
+allstate %>% summarise(n(),mean(StarDiff))
+allstate
 number_dwellings <- allstate %>% group_by(State) %>% summarise(DwellingNo = n() )
 number_dwellings
 
@@ -521,6 +523,7 @@ stardiff
 #view(stardiff)
 averagediff <- group_by(abs_allstate, State) %>% summarise(MeanStarDiff= mean(StarDiff),MeanAbsStarDiff= mean(AbsDiff) ) 
 averagediff
+averagediff %>% summarise(mean(MeanStarDiff))
 # Using ggplot2
 figure1 <- ggplot(
   data = number_dwellings, 
