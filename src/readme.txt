@@ -10,3 +10,4 @@ Result2.csv and Result2_Orig.csv contain the simulation results which are requir
 
 The above processing is state by state. Then, the star-rating differences for all the states and terretories are combined in one csv file Result2_Orig_Clean_AllState.csv for plotting using Plots.R.
 
+remotes::install_github("sparce/DSreport")
