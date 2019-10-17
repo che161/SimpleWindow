@@ -3,19 +3,25 @@ library(tidyverse)
 #CCCCCCCCCCCCCCCCC       Clean data       CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 #CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 # Clean data for NT
+# First read in Result2.txt which contains the information for all houses collected from the state 
 overheat_result2 <- read_fwf("data/NT/Result2.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
-        StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20
-        ,
-        CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
+        StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
+        CZ = 2, BL = 1,SubDir = 97, ScratchName = NA)) 
+
+# Second read in Result2_error.txt which contains the information for all houses collected from the state
+# which has issues in the data 
 overheat_result2_error <- read_fwf("data/NT/Result2_error.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
         StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
         CZ = 2, BL = 1,SubDir = 97, ScratchName = NA))
 overheat_result2
 overheat_result2_error
+
+# Figure out the those house numbers which do not have issues. 
 validRow <- overheat_result2 %>% 
   anti_join(overheat_result2_error, by = "ScratchName" ) %>% select("Nvalid")
 validRow
 
+# Now read in the performance data for each house using the existing window model in the state
 overheatcsv_orig <- read.csv("data/NT/Result2_Orig.csv", header = FALSE, col.names = c(
   "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
   "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
@@ -25,9 +31,11 @@ overheatcsv_orig <- read.csv("data/NT/Result2_Orig.csv", header = FALSE, col.nam
 ))
 overheatcsv_orig
 
+# Clean the performance data just contain those house which do not have issues.
 overheatorig_clean <- overheatcsv_orig %>% semi_join(validRow, by = "Nvalid") %>%
   write_csv("res/NT/Result2_Orig_Clean.csv")
 
+# Now read in the performance data for each house using the new window model in the state
 overheatcsv <- read.csv("data/NT/Result2.csv", header = FALSE, col.names = c(
   "Nvalid", "StateName", "NPostCode", "NYear", "NClimateZone", "StarRating", 
   "Exposure","X", "CertificateHeating", "CertificateSCool", "CertificateLCool","TotalFlArea", 
@@ -37,23 +45,30 @@ overheatcsv <- read.csv("data/NT/Result2.csv", header = FALSE, col.names = c(
 ))
 overheatcsv
 
+# Clean the performance data just contain those house which do not have issues.
 overheat_clean <- overheatcsv %>% semi_join(validRow, by = "Nvalid") %>% 
   write_csv("res/NT/Result2_Clean.csv")
 
+# Only keep the hose number and the star rating column.
 overheat_star_Orig <- select(overheatorig_clean, Nvalid, StarRating)
 overheat_star_Orig
 overheat_star <- select(overheat_clean, Nvalid, StarRating)
 overheat_star
 
+# Now join the tables for existing and the new window model results, and
+# work out the change in the star rating due to the change in the window model
+# and also create a column with state name
 overheat_stardiff <- overheat_star_Orig %>% inner_join(overheat_star, by = "Nvalid") %>% 
   mutate(StarDiff = StarRating.x - StarRating.y, State = "NT") %>% 
   rename(StarratingOrig = StarRating.x, Starrating = StarRating.y) %>%
   select(State,StarDiff) %>% 
   write_csv("res/NT/Result2_StarDiff.csv")
 
+# Assign to a NT data form
 overheat_stardiff_NT <- overheat_stardiff
 overheat_stardiff_NT
 
+#Now copy and work out for other states and territories
 # Clean data for ACT
 overheat_result2 <- read_fwf("data/ACT/Result2.txt",fwf_cols(Nvalid = 7, UnitNo = 8, 
                                                             StreetNo = 8, StreetType = 16, StreetName = 48, Suburb = 24, WallType = 20,
